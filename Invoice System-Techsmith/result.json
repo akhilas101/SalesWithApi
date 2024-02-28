@@ -1,0 +1,59 @@
+
+{
+    "invoice_date": "23/02/2024",
+    "billseries": "A",
+    "order_no":"123",
+    "order_receiver_name":"Akhil",
+    "order_receiver_address":"Kochi",
+    "totalNetValue":"1000.0",
+    "totalTaxValue":"90.58",
+    "totalRoundOValue":"0.58",
+    "totalAmountValue":"1090.00",
+
+    "itemlines": [
+        {
+            "slno": 1,   
+            "code": "A-2",
+            "item_name": "Calpol",
+            "quantity": "1",
+            "price": "100.0",
+            "Amt": "100.0",
+            "dis_percentage": "10",
+            "dis_amount": "10",
+            "net_amount": "90.0",
+            "tax": "8",
+            "gst": "8.0",
+            "total_amount": "90.00"
+                         },
+        {
+            "slno": 2,
+            "code": "A-3",
+            "item_name": "Dolo",
+            "quantity": "1",
+            "price": "200.0",
+            "Amt": "216.0",
+            "dis_percentage": "10",
+            "dis_amount": "21.6",
+            "net_amount": "216.0",
+            "tax": "8.0",
+            "gst": "16.0",
+            "total_amount": "216.0"
+                         }
+               ]
+       }
+
+
+Api Response ( Success)	
+{
+  "errorstatus": 0,
+  "statusmessage": "Success"
+
+}
+
+
+Api Response ( Failure)	
+{
+    "errorstatus": 1,
+    "statusmessage": "Failed to save data"
+
+}

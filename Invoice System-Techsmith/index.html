@@ -1,0 +1,3063 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+  <link rel="stylesheet" href="css/invoice.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.dataTables.min.js"></script>
+  <script src="js/dataTables.bootstrap.min.js"></script>
+  <script src="js/bootstrap-datepicker.js"></script>
+
+</head>
+
+<body
+  style="background: url('https://tse4.explicit.bing.net/th?id=OIP.0kWb8VPE2lMNwZNbHTla1AHaDP&pid=Api&P=0&h=180') no-repeat center center fixed; -webkit-background-size: cover; -moz-background-size: cover; -o-background-size: cover; background-size: cover;">
+
+  <div id="viewport-info" class="no-print">Viewport Size: Large</div>
+
+  <script>
+    // Check the viewport size and set the content dynamically
+    function updateViewportInfo() {
+      var viewportInfo = document.getElementById('viewport-info');
+      var viewportSize = window.innerWidth;
+
+      // Customize the condition based on your preferred breakpoint
+      if (viewportSize >= 1200) {
+        viewportInfo.textContent = 'Viewport Size: Large';
+      } else {
+        viewportInfo.textContent = 'Viewport Size: Small';
+      }
+    }
+
+    // Call the function on page load and when the window is resized
+    window.addEventListener('load', updateViewportInfo);
+    window.addEventListener('resize', updateViewportInfo);
+
+
+    //view size
+
+
+
+
+    function updateViewportInfo() {
+      const viewportInfo = document.getElementById('viewport-info');
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      if (screenWidth >= 992 && screenWidth <= 1199.98) {
+        viewportInfo.textContent = `Viewport Size: Medium (${screenWidth}px x ${screenHeight}px)`;
+      } else if (screenWidth >= 668 && screenWidth <= 991.98) {
+        viewportInfo.textContent = `Viewport Size: Small (${screenWidth}px x ${screenHeight}px)`;
+      } else if (screenWidth >= 580 && screenWidth <= 667.98) {
+        viewportInfo.textContent = `Viewport Size: Extra Small (${screenWidth}px x ${screenHeight}px)`;
+      } else if (screenWidth >= 280 && screenWidth <= 580) {
+        viewportInfo.textContent = `Viewport Size: Very Small (${screenWidth}px x ${screenHeight}px)`;
+      } else if (screenWidth < 280) {
+        viewportInfo.textContent = `Viewport Size: Tiny (${screenWidth}px x ${screenHeight}px)`;
+      } else {
+        viewportInfo.textContent = `Viewport Size: Large (${screenWidth}px x ${screenHeight}px)`;
+      }
+    }
+
+    // Initial update on page load
+    updateViewportInfo();
+
+    // Update on window resize
+    window.addEventListener('resize', updateViewportInfo);
+
+  </script>
+
+
+
+
+
+  <div class="container-fluid">
+    <br>
+
+    <form method="post" id="invoice_form">
+      <div class="table-responsive">
+        <nav class="navbar navbar-default card">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Billing System</a>
+            </div>
+          </div>
+        </nav>
+        <table class="table table-bordered card">
+          <tr>
+            <td colspan="2">
+              <div class="row">
+                <div class="col-md-8">
+                  <b>RECEIVER (BILL TO) INFORMATION</b><br />
+                  <div class="form-group">
+                    <input type="text" name="order_receiver_name" id="order_receiver_name" class="form-control input-sm"
+                      placeholder="Enter Receiver Name" style="width: 400px;" />
+                  </div>
+                  <div class="form-group">
+                    <textarea name="order_receiver_address" id="order_receiver_address" class="form-control"
+                      placeholder="Enter Billing Address" style="width: 400px;"></textarea>
+                  </div>
+                </div>
+                <div class="col-md-4">
+
+                  <div class="form-group">
+                    <b>INVOICE DETAILS</b><br />
+                    <input type="text" name="order_no" id="order_no" class="form-control input-sm number_only"
+                      maxlength="16" placeholder="Enter Invoice No." style="width: 150px;" />
+                  </div>
+
+                  <div class="form-group">
+                    <b>Invoice Date</b><br />
+
+                    <input type="date" name="invoice_date" id="invoice_date" class="form-control"
+                      style="width: 150px;" />
+                  </div>
+                </div>
+
+                <!-- Validate date on form submission -->
+                <script>
+                  $(document).ready(function () {
+                    $('#invoice_form').on('submit', function (e) {
+                      var selectedDate = $('#order_date').val();
+
+                      // Check if the date is empty or not valid
+                      if (!selectedDate || !isValidDate(selectedDate)) {
+                        e.preventDefault();
+                        alert('Please select a valid invoice date.');
+                      }
+                    });
+
+                    // Function to check if a date is valid
+                    function isValidDate(dateString) {
+                      // Regular expression to validate the date format (yyyy-mm-dd)
+                      var regex = /^\d{4}-\d{2}-\d{2}$/;
+                      return regex.test(dateString);
+                    }
+                  });
+
+
+                </script>
+
+
+              </div>
+              <br />
+              <table id="invoice-item-table" class="table table-bordered table-hover table-striped">
+                <tr>
+
+                  <th width="9%">CODE</th>
+                  <th width="16%">Item Name</th>
+                  <th width="9%" class="numeric-input text-right">Quantity</th>
+                  <th width="9%" class="numeric-input text-right">Price</th>
+                  <th width="8%" class="numeric-input text-right"> Amt.</th>
+                  <th width="6%" class="numeric-input text-right">Dis %</th>
+                  <th width="8%" class="numeric-input text-right">Dis Amt.</th>
+                  <th width="8%" class="numeric-input text-right">Net Amt</th>
+                  <th width="6%" class="numeric-input text-right">Tax</th>
+                  <th width="8%" class="numeric-input text-right">GST</th>
+
+                  <th width="9%" class="numeric-input text-right">Total Amt.</th>
+                </tr>
+
+          
+              </table>
+
+
+
+
+
+
+      </div>
+
+      <div class="totals-section">
+        <h3>Totals</h3>
+
+
+        <span>Item Total: <span id="totalNetValue">0.00</span></span>
+        <span>Total Tax: <span id="totalTaxValue">0.00</span></span>
+        <span>Round Off: <span id="totalRoundOValue">0.00</span></span>
+        <span>Bill Amount: <span id="totalAmountValue">0.00</span></span>
+      </div>
+
+
+  </div>
+  <style>
+    .button-container {
+      position: absolute;
+      bottom: 17px;
+      right: 175px;
+    }
+
+    .button-container1 {
+      position: absolute;
+      bottom: 20px;
+      left: 150px;
+    }
+  </style>
+
+  <div class="button-container">
+    <img src="https://tse4.mm.bing.net/th?id=OIP._EAdOXEwRby-vZU0wwCsuwHaHa&pid=Api&P=0&h=180" alt="Add" id="add_row"
+      class="add-icon" />
+  </div>
+
+  <div class="button-container1">
+    <img src="https://cdn.pixabay.com/photo/2014/04/03/00/42/delete-309165_960_720.png" alt="Delete" id="delete_row"
+      class="delete-icon" />
+  </div>
+
+  <!-- Your table goes here -->
+
+
+
+
+  <div align="center">
+    <button type="button" name="create_invoice" id="create_invoice" class="btn btn-success">Submit</button>
+  </div>
+
+
+  </form>
+  </div>
+  <style>
+    .delete-icon {
+      width: 20px;
+      /* Set the width */
+      height: 20px;
+      /* Set the height */
+    }
+
+    .button-container img {
+      max-width: 20%;
+      max-height: 10%;
+    }
+
+
+    @media print {
+
+      /* Print-specific styles */
+      body {
+        width: 21cm;
+        height: 29.7cm;
+        margin: 1cm;
+      }
+
+      /* Hide child rows */
+      #invoice-item-table .child-row {
+        display: none !important;
+      }
+
+      /* Display values in the main rows without borders */
+      #invoice-item-table .main-row input {
+        display: inline !important;
+        border: none !important;
+        /* Remove border for main row inputs */
+      }
+
+      /* Remove table border lines */
+      #invoice-item-table {
+        border-collapse: separate !important;
+      }
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        border: none !important;
+        padding: 5px;
+        /* Optional: Add padding for better spacing */
+      }
+    }
+
+
+
+    .button-container button {
+      background-color: lightgray;
+      /* Change the color to your desired color */
+      color: white;
+      /* Change the text color if needed */
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Function to calculate values (total amount, discount amount, GST) for a given row
+      function calculateValues(row) {
+        var quantity = parseFloat(row.find('input[name="quantity"]').val()) || 0;
+        var price = parseFloat(row.find('input[name="price"]').val()) || 0;
+        var disPercentage = parseFloat(row.find('input[name="dis_percentage"]').val()) || 0;
+        var taxPercentage = parseFloat(row.find('input[name="tax"]').val()) || 0;
+
+        // Calculate Amt
+        var Amt = quantity * price;
+
+        // Calculate total amount before discount
+        var totalBeforeDiscount = Amt;
+
+        // Calculate discount amount
+        var disAmount = (totalBeforeDiscount * disPercentage) / 100;
+
+        // Subtract discount amount from total amount
+        totalBeforeDiscount -= disAmount;
+
+        // Calculate GST based on the total amount before discount
+        var gst = (totalBeforeDiscount * taxPercentage) / 100;
+
+        // Calculate total amount including tax after discount
+        var totalAmount = totalBeforeDiscount + gst;
+
+        // Update Amt field in the row
+        row.find('input[name="Amt"]').val(Amt.toFixed(2));
+
+        // Update discount amount, GST, and total amount fields in the row
+        row.find('input[name="dis_amount"]').val(disAmount.toFixed(2));
+        row.find('input[name="gst"]').val(gst.toFixed(2));
+        row.find('input[name="total_amount"]').val(totalAmount.toFixed(2));
+
+        // Calculate net amount
+        var netAmount = Amt - disAmount;
+
+        // Update net amount field in the row
+        row.find('input[name="net_amount"]').val(netAmount.toFixed(2));
+
+        // Trigger update of Totals section
+        updateTotals();
+      }
+
+      // Function to update Totals section
+      function updateTotals() {
+        var totalTax = 0;
+        var totalAmount = 0;
+        var totalNetValue = 0;
+        var totalRoundOValue = 0;
+
+        $('#invoice-item-table tbody tr').each(function () {
+          totalTax += parseFloat($(this).find('input[name="gst"]').val()) || 0;
+          totalNetValue += parseFloat($(this).find('input[name="net_amount"]').val()) || 0;
+        });
+
+        // Calculate totalAmount without decimal places
+        var totalAmount = Math.round(totalTax + totalNetValue); // Round the total amount to the nearest whole number
+        var totalRoundOValue = totalAmount - (totalTax + totalNetValue); // Calculate the round off value
+
+        // Update Totals section values
+        $('#totalNetValue').text(totalNetValue.toFixed(2));
+        $('#totalTaxValue').text(totalTax.toFixed(2));
+        $('#totalRoundOValue').text(totalRoundOValue.toFixed(2)); // Corrected the id here
+        $('#totalAmountValue').text(totalAmount);
+      }
+
+      // Event listener for input changes (quantity, price, tax, discount percentage)
+      $('#invoice-item-table').on('input', 'input[name="quantity"], input[name="price"], input[name="tax"], input[name="dis_percentage"]', function () {
+        var row = $(this).closest('tr');
+        calculateValues(row);
+      });
+
+      // Delete button action
+      $('.delete-icon').on('click', function () {
+        var rowCount = $('#invoice-item-table tbody tr').length;
+        if (rowCount > 1) {
+          $('#invoice-item-table tbody tr:last').remove();
+          updateTotals();
+        } else {
+          alert("You cannot delete the first row.");
+        }
+      });
+
+      // Trigger initial calculations on page load
+      updateTotals();
+    });
+  </script>
+
+
+  <script>
+    $(document).ready(function () {
+      // Function to collect and construct JSON data
+      function collectData() {
+        var tableData = [];
+
+        // Loop through each row of the table
+        $('#invoice-item-table tbody tr').each(function () {
+          var rowData = {};
+
+          // Extract data from input fields in the current row
+          $(this).find('input').each(function () {
+            var fieldName = $(this).attr('name');
+            var fieldValue = $(this).val();
+
+            // Exclude input fields with empty values
+            if (fieldValue.trim() !== '') {
+              // Convert quantity, price, etc. to numbers if necessary
+              if (fieldName === 'quantity' || fieldName === 'price' || fieldName === 'Amt' || fieldName === 'dis_percentage' || fieldName === 'dis_amount' || fieldName === 'net_amount' || fieldName === 'tax' || fieldName === 'gst' || fieldName === 'total_amount') {
+                fieldValue = parseFloat(fieldValue);
+              }
+              rowData[fieldName] = fieldValue;
+            }
+          });
+
+          // Add the row data to the tableData array
+          tableData.push(rowData);
+        });
+
+        // Construct JSON object
+        var jsonData = {
+          "table_data": tableData
+        };
+
+        return jsonData;
+      }
+
+      // Event listener for the "Submit" button
+      $('#create_invoice').on('click', function () {
+        var jsonData = collectData();
+
+        // Convert JSON object to string and log it (you can send it to the server or perform other actions as needed)
+        console.log(JSON.stringify(jsonData));
+      });
+    });
+  </script>
+
+
+  <script>
+ $(document).ready(function() {
+  // Sample JSON data
+  var jsonData = {
+    "invoice_date": "2/02/2024",
+    "billseries": "A",
+    "order_no": "123",
+    "order_receiver_name": "Akhil",
+    "order_receiver_address": "Kochi",
+    "totalNetValue": "108.00",
+    "totalTaxValue": "8.64",
+    "totalRoundOValue": "0.36",
+    "totalAmountValue": "116.00",
+    "itemlines": [
+      {
+        "slno": 1,
+        "code": "A-29124",
+        "item_name": "Calpol",
+        "quantity": "1",
+        "price": "50.0",
+        "Amt": "50.0",
+        "dis_percentage": "10",
+        "dis_amount": "5.00",
+        "net_amount": "45.0",
+        "tax": "8",
+        "gst": "3.60",
+        "total_amount": "48.60"
+      },
+      {
+        "slno": 2,
+        "code": "A-38569",
+        "item_name": "Dolo",
+        "quantity": "2",
+        "price": "35.0",
+        "Amt": "70.0",
+        "dis_percentage": "10",
+        "dis_amount": "7.00",
+        "net_amount": "63.00",
+        "tax": "8.0",
+        "gst": "5.04",
+        "total_amount": "68.04"
+      }
+    ]
+  };
+
+  // Populate Receiver Bill Information
+  $('#order_receiver_name').val(jsonData.order_receiver_name);
+  $('#order_receiver_address').val(jsonData.order_receiver_address);
+  $('#order_no').val(jsonData.order_no);
+  $('#invoice_date').val(jsonData.invoice_date);
+
+  // Populate Table Data
+  $.each(jsonData.itemlines, function(index, item) {
+    var newRow = '<tr>' +
+      '<td><input type="text" name="code" maxlength="12" class="form-control input-sm" value="' + item.code + '" /></td>' +
+      '<td><input type="text" name="item_name" maxlength="30" class="form-control input-sm" value="' + item.item_name + '" /></td>' +
+      '<td><input type="number" name="quantity" maxlength="8" class="form-control input-sm text-right" value="' + item.quantity + '" /></td>' +
+      '<td><input type="number" name="price" maxlength="10" class="form-control input-sm text-right" value="' + item.price + '" /></td>' +
+      '<td><input type="number" name="Amt" maxlength="10" class="form-control input-sm text-right" value="' + item.Amt + '" readonly /></td>' +
+      '<td><input type="number" name="dis_percentage" maxlength="5" class="form-control input-sm text-right" value="' + item.dis_percentage + '" /></td>' +
+      '<td><input type="number" name="dis_amount" maxlength="10" class="form-control input-sm text-right" value="' + item.dis_amount + '" readonly /></td>' +
+      '<td><input type="number" name="net_amount" maxlength="10" class="form-control input-sm text-right" value="' + item.net_amount + '" readonly /></td>' +
+      '<td><input type="number" name="tax" maxlength="5" class="form-control input-sm text-right" value="' + item.tax + '" /></td>' +
+      '<td><input type="number" name="gst" maxlength="10" class="form-control input-sm text-right" value="' + item.gst + '" readonly /></td>' +
+      '<td><input type="number" name="total_amount" maxlength="10" class="form-control input-sm text-right" value="' + item.total_amount + '" readonly /></td>' +
+      '</tr>';
+    $('#invoice-item-table tbody').append(newRow);
+  });
+
+  // Calculate and Populate Totals
+  calculateAndPopulateTotals();
+
+  // Function to calculate and populate totals
+  function calculateAndPopulateTotals() {
+    var itemTotal = parseFloat(jsonData.totalNetValue);
+    var totalTax = parseFloat(jsonData.totalTaxValue);
+
+    // Populate totals
+    $('#totalNetValue').text(itemTotal.toFixed(2));
+    $('#totalTaxValue').text(totalTax.toFixed(2));
+    $('#totalRoundOValue').text(parseFloat(jsonData.totalRoundOValue).toFixed(2));
+    $('#totalAmountValue').text(parseFloat(jsonData.totalAmountValue).toFixed(2));
+  }
+});
+
+  </script>
+
+
+<script>
+
+$(document).ready(function() {
+    // Event listener for the "Submit" button
+    $('#create_invoice').on('click', function () {
+        var invoiceData = collectFormData();
+        console.log(invoiceData); // Log the collected data to the console
+        // Here you can further process the data, send it to a server, or store it locally
+    });
+
+    // Function to collect form data
+    function collectFormData() {
+        var formData = {};
+
+        // Receiver information
+        formData.order_receiver_name = $('#order_receiver_name').val();
+        formData.order_receiver_address = $('#order_receiver_address').val();
+        formData.order_no = $('#order_no').val();
+        formData.invoice_date = $('#invoice_date').val();
+
+        // Table data (item lines)
+        formData.itemlines = [];
+        $('#invoice-item-table tbody tr').each(function(index, row) {
+            var itemData = {};
+            $(row).find('input').each(function() {
+                itemData[$(this).attr('name')] = $(this).val();
+            });
+            formData.itemlines.push(itemData);
+        });
+
+        // Totals
+        formData.totalNetValue = $('#totalNetValue').text();
+        formData.totalTaxValue = $('#totalTaxValue').text();
+        formData.totalRoundOValue = $('#totalRoundOValue').text();
+        formData.totalAmountValue = $('#totalAmountValue').text();
+
+        return formData;
+    }
+});
+
+</script>
+  <script>
+
+    // Function to add a new data entry row to the table
+    function addDataEntryRow() {
+      var newRowHtml = '<tr>' +
+        '<td><input type="text" name="code" maxlength="12" class="form-control input-sm" value="" /></td>' +
+        '<td><input type="text" name="item_name" maxlength="30" class="form-control input-sm" value="" /></td>' +
+        '<td><input type="number" name="quantity" maxlength="8" class="form-control input-sm text-right" value="" /></td>' +
+        '<td><input type="number" name="price" maxlength="10" class="form-control input-sm text-right" pattern="^\d{1,8}(\.\d{0,2})?$" value="" /></td>' +
+        '<td><input type="number" name="Amt" maxlength="10" class="form-control input-sm text-right" readonly /></td>' +
+
+        '<td><input type="number" name="dis_percentage" maxlength="5" class="form-control input-sm text-right" pattern="\d+(\.\d{1,2})?" value="" /></td>' +
+        '<td><input type="number" name="dis_amount" maxlength="10" class="form-control input-sm text-right" readonly /></td>' +
+        '<td><input type="number" name="net_amount" maxlength="10" class="form-control input-sm text-right" readonly /></td>' +
+        '<td><input type="number" name="tax" maxlength="5" class="form-control input-sm text-right" pattern="\d+(\.\d{1,2})?" value="" /></td>' +
+        '<td><input type="number" name="gst" maxlength="10" class="form-control input-sm text-right" pattern="\d+(\.\d{1,2})?" readonly /></td>' +
+        '<td><input type="number" name="total_amount" maxlength="10" class="form-control input-sm text-right" readonly /></td>' +
+        '</tr>';
+
+
+
+      $('#invoice-item-table tbody').append(newRowHtml); // Append the new row HTML to the table body
+
+      // Trigger calculations for the new row
+      calculateValues($('#invoice-item-table tbody tr:last-child'));
+    }
+    // Event listener for adding a row
+    $('#add_row').on('click', function () {
+      addDataEntryRow(); // Call the function to add a new data entry row
+    });
+
+  </script>
+
+
+
+
+
+
+
+  <script>
+    $(document).ready(function () {
+      // Event listener for submit button click
+      $('#create_invoice').click(function () {
+        // Initialize an empty JSON object to store the form data
+        var formData = {};
+
+        // Extract receiver bill information
+        formData.receiver_bill_information = {
+          receiver_name: $('#order_receiver_name').val(),
+          billing_address: $('#order_receiver_address').val(),
+          invoice_number: $('#order_no').val(),
+          invoice_date: $('#invoice_date').val()
+        };
+
+        // Extract table data
+        formData.table_data = [];
+        $('#invoice-item-table tbody tr').each(function () {
+          var row = {};
+          $(this).find('input').each(function () {
+            row[$(this).attr('name')] = $(this).val();
+          });
+          formData.table_data.push(row);
+        });
+
+        // Extract totals
+        formData.totals = {
+          item_total: parseFloat($('#totalNetValue').text()),
+          total_tax: parseFloat($('#totalTaxValue').text()),
+          round_off: parseFloat($('#totalRoundOValue').text()),
+          bill_amount: parseFloat($('#totalAmountValue').text())
+        };
+
+        // Convert JSON object to string for storage or further processing
+        var jsonDataString = JSON.stringify(formData);
+
+        // Display the JSON data (you can store it, send it via AJAX, or perform any other action here)
+        console.log(jsonDataString);
+      });
+    });
+
+  </script>
+
+  <style>
+    .totals-and-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      /* Change align-items to center */
+      margin-top: 20px;
+    }
+
+    .totals-section {
+      text-align: right;
+      width: 90%;
+      /* Ensure it takes up the full width */
+      box-sizing: border-box;
+      /* Include padding and border in the width */
+    }
+
+    .totals-section h3 {
+      margin-bottom: 10px;
+    }
+
+    .totals-section span {
+      display: block;
+      /* Remove the extra character 'm' */
+    }
+
+
+
+
+
+
+    @media only screen and (min-width: 1615px) {
+
+      .col-md-4 {
+        position: absolute;
+        top: 2%;
+        /* Adjust this value as needed */
+        left: 89%;
+        /* Adjust this value as needed */
+      }
+
+      .col-md-8 {
+        right: 0.5%;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -150px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 1px;
+      }
+
+    }
+
+    @media only screen and (min-width:1683px) and (max-width: 1700px) {
+      .col-md-4 {
+        position: absolute;
+        top: 2%;
+        /* Adjust this value as needed */
+        left: 89.5%;
+        /* Adjust this value as needed */
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+    }
+
+
+    @media only screen and (min-width:1650px) and (max-width:1683px) {
+      .col-md-4 {
+        position: absolute;
+        top: 2%;
+        /* Adjust this value as needed */
+        left: 89.3%;
+        /* Adjust this value as needed */
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+    }
+
+
+
+
+
+
+
+
+
+    @media only screen and (min-width:1443px) and (max-width: 1615px) {
+      #invoice-item-table {
+        border-top: none;
+        /* Remove top border */
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+      }
+
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        /* Center the contents horizontally within each row */
+      }
+
+
+
+
+      /* Adjusted flex-basis for the cells in the first row */
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(10% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(16% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(8.8% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(9% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(6% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(6% - 10px);
+        box-sizing: border-box;
+
+      }
+
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+
+      }
+
+
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+
+      }
+
+
+      td[colspan="2"] {
+        text-align: center;
+      }
+
+      .col-md-8,
+      .col-md-4 {
+        margin: 0 auto;
+        max-width: 800px;
+
+      }
+
+      .form-group {
+        text-align: left;
+      }
+
+      .form-control {
+        width: 100%;
+      }
+
+      .col-md-8 .form-control {
+        max-width: 400px;
+
+        margin: 0 auto;
+
+      }
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 88%;
+
+      }
+
+      .col-md-8 {
+        right: 11%;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 9.4%;
+
+      }
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -58px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 15px;
+      }
+
+
+    }
+
+    /*     Invoice Details manage */
+
+
+    /* 1*/
+
+
+
+    @media only screen and (min-width:1550px) and (max-width: 1585px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87.7%;
+
+      }
+
+      .col-md-8 {
+        right: 11.4%;
+      }
+
+
+    }
+
+
+    /*  2 */
+
+    @media only screen and (min-width:1530px) and (max-width: 1549px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87.3%;
+
+      }
+
+      .col-md-8 {
+        right: 11.4%;
+      }
+
+
+    }
+
+    /* 3 */
+
+    @media only screen and (min-width:1510px) and (max-width: 1529px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87.2%;
+
+      }
+
+      .col-md-8 {
+        right: 11.5%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 9.2%;
+
+      }
+
+    }
+
+
+    /* 4 */
+
+    @media only screen and (min-width:1490px) and (max-width: 1509px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87%;
+
+      }
+
+      .col-md-8 {
+        right: 11.6%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 9.2%;
+
+      }
+
+    }
+
+    /* 5 */
+
+    @media only screen and (min-width:1465px) and (max-width: 1489px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 86.8%;
+
+      }
+
+      .col-md-8 {
+        right: 11.6%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 9.1%;
+
+      }
+
+    }
+
+    /* 6 */
+
+    @media only screen and (min-width:1443px) and (max-width: 1464px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 86.5%;
+
+      }
+
+      .col-md-8 {
+        right: 11.8%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 9.1%;
+
+      }
+
+    }
+
+
+
+
+    @media only screen and (min-width:1320px) and (max-width: 1443px) {
+
+
+
+
+
+
+      /* Adjusted flex-basis for the cells in the first row */
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(11% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(19% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(9.5% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(9.5% - 10px);
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(6.5% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(9.5% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(6.8% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(4.5% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87.4%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 10%;
+
+      }
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 15px;
+      }
+
+    }
+
+    /* 1 */
+    @media only screen and (min-width:1400px) and (max-width: 1424px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87.4%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 10.1%;
+
+      }
+
+    }
+
+    /* 2 */
+    @media only screen and (min-width:1378px) and (max-width: 1399px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 87.1%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 10.1%;
+
+      }
+
+    }
+
+
+    /* 3*/
+    @media only screen and (min-width:1340px) and (max-width: 1377px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 86.7%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 10%;
+
+      }
+
+    }
+
+    /* 4*/
+    /* 3*/
+    @media only screen and (min-width:1320px) and (max-width: 1339px) {
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 86.5%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 10%;
+
+      }
+
+    }
+
+
+
+
+
+    @media only screen and (min-width:1256px) and (max-width: 1319px) {
+
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(3% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(7% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(10% - 10px);
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(7% - 10px);
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(11% - 10px);
+        box-sizing: border-box;
+
+        #invoice-item-table th:nth-child(8),
+        #invoice-item-table td:nth-child(8) {
+          flex-basis: calc(7% - 10px);
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(9),
+        #invoice-item-table td:nth-child(9) {
+          flex-basis: calc(11% - 10px);
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(10),
+        #invoice-item-table td:nth-child(10) {
+          flex-basis: calc(11% - 10px);
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(11),
+        #invoice-item-table td:nth-child(11) {
+          flex-basis: calc(11% - 10px);
+          box-sizing: border-box;
+        }
+
+      }
+
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 85.8%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+
+        left: 10%;
+
+      }
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 8px;
+      }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @media only screen and (min-width:960px) and (max-width:1255px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(39% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(50% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(14% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(13% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(13% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(8% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(12% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(12% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(8% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(12.5% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(12% - 10px);
+
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 20%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+
+
+      /* Right-align content in the second row */
+      #invoice-item-table tr:nth-child(2) th,
+      #invoice-item-table tr:nth-child(2) td {
+        text-align: right;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+
+
+      .col-md-4 {
+        position: absolute;
+
+        left: 85.2%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+    }
+
+    /* 1 */
+    @media only screen and (min-width:1165px) and (max-width:1199px) {
+      .col-md-4 {
+        position: absolute;
+
+        left: 84.8%;
+
+      }
+    }
+
+
+
+    /* 2 */
+    @media only screen and (min-width:1130px) and (max-width:1164px) {
+      .col-md-4 {
+        position: absolute;
+
+        left: 84.3%;
+
+      }
+    }
+
+    /* 3 */
+    @media only screen and (min-width:1100px) and (max-width:1129px) {
+      .col-md-4 {
+        position: absolute;
+
+        left: 83.8%;
+
+      }
+    }
+
+    /* 4 */
+    @media only screen and (min-width:1090px) and (max-width:1099px) {
+      .col-md-4 {
+        position: absolute;
+
+        left: 83.5%;
+
+      }
+    }
+
+
+
+
+
+
+    @media only screen and (min-width:1056px) and (max-width:1075px) {
+      .col-md-4 {
+        position: absolute;
+
+
+        left: 82.8%;
+
+      }
+
+    }
+
+    @media only screen and (min-width:1010px) and (max-width:1055px) {
+      .col-md-4 {
+        position: absolute;
+
+
+        left: 82.2%;
+
+      }
+
+    }
+
+    @media only screen and (min-width:960px) and (max-width:1010px) {
+      .col-md-4 {
+        position: absolute;
+
+        top: 2%;
+        left: 81.3%;
+
+      }
+
+    }
+
+
+
+
+
+    @media only screen and (min-width:860px) and (max-width:959px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(36% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(46% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(21% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(16% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(24% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(23% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(21% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(16% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(23% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(23% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(20% - 10px);
+
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 20%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+
+
+      /* Right-align content in the second row */
+      #invoice-item-table tr:nth-child(2) th,
+      #invoice-item-table tr:nth-child(2) td {
+        text-align: right;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+
+
+      .col-md-4 {
+        position: absolute;
+        top: 2%;
+        left: 80.5%;
+
+      }
+
+      .col-md-8 {
+        right: 0%;
+      }
+    }
+
+    @media only screen and (min-width:680px) and (max-width:861px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(36% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(46% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(21% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(16% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(24% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(23% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(21% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(16% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(23% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(23% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(20% - 10px);
+
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 20%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+
+
+      /* Right-align content in the second row */
+      #invoice-item-table tr:nth-child(2) th,
+      #invoice-item-table tr:nth-child(2) td {
+        text-align: right;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+
+
+
+
+      .col-md-8 {
+        right: 0%;
+      }
+    }
+
+
+
+
+
+
+
+
+
+    @media only screen and (min-width:881px) and (max-width:918px) {
+
+
+
+      .col-md-4 {
+        position: absolute;
+        top: 2%;
+        left: 79.5%;
+
+      }
+
+    }
+
+
+
+
+    @media only screen and (min-width:860px) and (max-width:880px) {
+
+
+
+      .col-md-4 {
+        position: absolute;
+        top: 0%;
+        left: 78.8%;
+
+      }
+
+    }
+
+
+
+
+
+
+    @media only screen and (min-width:516px) and (max-width:679px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(25% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(54% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(25% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(25% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(28% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(40% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(40% - 10px);
+
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(22.5% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 20%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+
+
+      /* Right-align content in the second row */
+      #invoice-item-table tr:nth-child(2) th,
+      #invoice-item-table tr:nth-child(2) td {
+        text-align: right;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+    }
+
+
+
+    @media only screen and (min-width:504px) and (max-width:516px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+
+        /* Align both rows to the left */
+      }
+
+
+
+      @media only screen and (min-width:504px) and (max-width:516px) {
+
+        /* Adjust the table layout for small screens */
+        #invoice-item-table tr {
+          display: flex;
+          flex-wrap: wrap;
+          /* Align both rows to the left */
+        }
+
+
+
+
+        #invoice-item-table th:nth-child(1),
+        #invoice-item-table td:nth-child(1) {
+          flex-basis: calc(25% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(2),
+        #invoice-item-table td:nth-child(2) {
+          flex-basis: calc(52% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+
+        #invoice-item-table th:nth-child(3),
+        #invoice-item-table td:nth-child(3) {
+          flex-basis: calc(27.5% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(4),
+        #invoice-item-table td:nth-child(4) {
+          flex-basis: calc(25% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(5),
+        #invoice-item-table td:nth-child(5) {
+          flex-basis: calc(26% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(6),
+        #invoice-item-table td:nth-child(6) {
+          flex-basis: calc(27% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(7),
+        #invoice-item-table td:nth-child(7) {
+          flex-basis: calc(25% - 10px);
+          /* Adjusted based on the specified width */
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(8),
+        #invoice-item-table td:nth-child(8) {
+          flex-basis: calc(26% - 10px);
+
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(9),
+        #invoice-item-table td:nth-child(9) {
+          flex-basis: calc(36% - 10px);
+
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th:nth-child(10),
+        #invoice-item-table td:nth-child(10) {
+          flex-basis: calc(40% - 10px);
+
+          box-sizing: border-box;
+        }
+
+
+        #invoice-item-table th:nth-child(11),
+        #invoice-item-table td:nth-child(11) {
+          flex-basis: calc(27% - 10px);
+
+          box-sizing: border-box;
+        }
+
+        #invoice-item-table th,
+        #invoice-item-table td {
+          background-color: white;
+          padding: 2px;
+          /* Adjust the padding as needed */
+          margin: 2px;
+          /* Adjust the margin as needed */
+        }
+
+        /* Styles for reducing the length of the white background text area */
+        #invoice-item-table textarea {
+          max-width: 20%;
+          /* Adjust the percentage to reduce the width */
+          box-sizing: border-box;
+        }
+
+
+
+        /* Right-align content in the second row */
+        #invoice-item-table tr:nth-child(2) th,
+        #invoice-item-table tr:nth-child(2) td {
+          text-align: right;
+        }
+
+        .totals-section {
+          position: relative;
+          top: 70%;
+          /* Adjust top position as needed */
+          left: 10%;
+          /* Adjust left position as needed */
+        }
+
+
+
+        .button-container {
+          position: absolute;
+          bottom: 10px;
+          right: -145px;
+        }
+
+        .button-container1 {
+          position: absolute;
+          bottom: 20px;
+          left: 10px;
+        }
+      }
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(25% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(52% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(27.5% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(25% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(26% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(27% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(25% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(26% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(36% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(40% - 10px);
+
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(27% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 20%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+
+
+      /* Right-align content in the second row */
+      #invoice-item-table tr:nth-child(2) th,
+      #invoice-item-table tr:nth-child(2) td {
+        text-align: right;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+    }
+
+
+
+
+
+    @media only screen and (min-width:450px) and (max-width:504px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+
+
+
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(29% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(49% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(39% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(39% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(39% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(39% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(39% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(39% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(36% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(40% - 10px);
+
+        box-sizing: border-box;
+      }
+
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(28% - 10px);
+
+        box-sizing: border-box;
+      }
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 20%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 7.5%;
+        /* Adjust left position as needed */
+      }
+
+
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -130px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @media only screen and (min-width:380px) and (max-width:449px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      #invoice-item-table textarea {
+        max-width: 5%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+      /* First Row */
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(67% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(67% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      /* Second Row */
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(39.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(30.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+
+
+
+
+
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(39.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(39.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(30.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(30.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+
+      /* Third Row */
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(39.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+
+
+
+      }
+
+      /* Third Row */
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(30% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+
+
+
+      }
+
+      #invoice-item-table {
+        display: flex;
+        justify-content: flex-end;
+        /* Align child rows to start from the right side */
+      }
+
+      #invoice-item-table th:nth-child(11),
+      #invoice-item-table td:nth-child(11) {
+        flex-basis: calc(35% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+
+        justify-content: right;
+
+      }
+
+      /* Styles for the white background text area */
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 5%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+
+      .col-md-8 {
+        /* Adjust the width of the container if needed */
+      }
+
+      .col-md-8 input[type="text"],
+      .col-md-8 textarea {
+        width: 100%;
+        /* Adjust the width of input and textarea elements */
+        max-width: 300px;
+        /* Optionally, you can set a maximum width */
+      }
+
+
+    }
+
+
+    @media only screen and (min-width:300px) and (max-width:390px) {
+
+      /* Adjust the table layout for small screens */
+      #invoice-item-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        /* Align both rows to the left */
+      }
+
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      #invoice-item-table textarea {
+        max-width: 5%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+      /* First Row */
+      #invoice-item-table th:nth-child(1),
+      #invoice-item-table td:nth-child(1) {
+        flex-basis: calc(69% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(2),
+      #invoice-item-table td:nth-child(2) {
+        flex-basis: calc(69% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      /* Second Row */
+
+
+      #invoice-item-table th:nth-child(3),
+      #invoice-item-table td:nth-child(3) {
+        flex-basis: calc(38.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(4),
+      #invoice-item-table td:nth-child(4) {
+        flex-basis: calc(33.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+
+
+
+
+
+
+      #invoice-item-table th:nth-child(7),
+      #invoice-item-table td:nth-child(7) {
+        flex-basis: calc(39.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+
+
+      #invoice-item-table th:nth-child(5),
+      #invoice-item-table td:nth-child(5) {
+        flex-basis: calc(39.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(6),
+      #invoice-item-table td:nth-child(6) {
+        flex-basis: calc(33.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #invoice-item-table th:nth-child(8),
+      #invoice-item-table td:nth-child(8) {
+        flex-basis: calc(33.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+
+      /* Third Row */
+      #invoice-item-table th:nth-child(9),
+      #invoice-item-table td:nth-child(9) {
+        flex-basis: calc(69.28% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+
+
+
+      }
+
+      /* Third Row */
+      #invoice-item-table th:nth-child(10),
+      #invoice-item-table td:nth-child(10) {
+        flex-basis: calc(34% - 10px);
+        /* Adjusted based on the specified width */
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+
+
+
+      }
+
+      /* Styles for the white background text area */
+      #invoice-item-table th,
+      #invoice-item-table td {
+        background-color: white;
+        padding: 2px;
+        /* Adjust the padding as needed */
+        margin: 2px;
+        /* Adjust the margin as needed */
+      }
+
+      /* Styles for reducing the length of the white background text area */
+      #invoice-item-table textarea {
+        max-width: 5%;
+        /* Adjust the percentage to reduce the width */
+        box-sizing: border-box;
+      }
+
+      .totals-section {
+        position: relative;
+        top: 70%;
+        /* Adjust top position as needed */
+        left: 10%;
+        /* Adjust left position as needed */
+      }
+
+      .button-container {
+        position: absolute;
+        bottom: 10px;
+        right: -145px;
+      }
+
+      .button-container1 {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+      }
+
+      .col-md-8 {
+        /* Adjust the width of the container if needed */
+      }
+
+      .col-md-8 input[type="text"],
+      .col-md-8 textarea {
+        width: 100%;
+        /* Adjust the width of input and textarea elements */
+        max-width: 280px;
+        /* Optionally, you can set a maximum width */
+      }
+    }
+  </style>
+
+
+
+
+
+
+
+
+
+  <style>
+    /* Add a class for right-aligned numeric inputs */
+    .numeric-input {
+      text-align: right;
+    }
+
+
+    /* Define alternating cell colors */
+    #invoice-item-table tbody tr:nth-child(odd) td {
+      background-color: white;
+      /* Change to your desired odd row color */
+    }
+
+    #invoice-item-table tbody tr:nth-child(even) td {
+      background-color: lightgoldenrodyellow;
+      /* Change to your desired even row color */
+    }
+  </style>
+
+
+
+  <style>
+    #invoice-item-table input[name="tax"] {
+      -moz-appearance: textfield;
+      /* Firefox */
+      appearance: textfield;
+      /* Standard */
+    }
+
+    #invoice-item-table input[name="tax"]::-webkit-inner-spin-button,
+    #invoice-item-table input[name="tax"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+
+  <style>
+    #invoice-item-table input[name="total_amount"] {
+      -moz-appearance: textfield;
+      /* Firefox */
+      appearance: textfield;
+      /* Standard */
+    }
+
+    #invoice-item-table input[name="total_amount"]::-webkit-inner-spin-button,
+    #invoice-item-table input[name="total_amount"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+
+  <style>
+    #invoice-item-table input[name="gst"] {
+      -moz-appearance: textfield;
+      /* Firefox */
+      appearance: textfield;
+      /* Standard */
+    }
+
+    #invoice-item-table input[name="gst"]::-webkit-inner-spin-button,
+    #invoice-item-table input[name="gst"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+
+  <style>
+    #invoice-item-table input[name="dis_amount"] {
+      -moz-appearance: textfield;
+      /* Firefox */
+      appearance: textfield;
+      /* Standard */
+    }
+
+    #invoice-item-table input[name="dis_amount"]::-webkit-inner-spin-button,
+    #invoice-item-table input[name="dis_amount"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+
+  <style>
+    #invoice-item-table input[name="Amt"] {
+      -moz-appearance: textfield;
+      /* Firefox */
+      appearance: textfield;
+      /* Standard */
+    }
+
+    #invoice-item-table input[name="Amt"]::-webkit-inner-spin-button,
+    #invoice-item-table input[name="Amt"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+
+
+<style>
+  #invoice-item-table input[name="net_amount"] {
+    -moz-appearance: textfield;
+    /* Firefox */
+    appearance: textfield;
+    /* Standard */
+  }
+
+  #invoice-item-table input[name="net_amount"]::-webkit-inner-spin-button,
+  #invoice-item-table input[name="net_amount"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+</style>
+
+
+
+
+
+
+</body>
+
+</html>
